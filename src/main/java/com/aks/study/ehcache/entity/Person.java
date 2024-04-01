@@ -10,19 +10,20 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 @Getter
+@EqualsAndHashCode
 public class Person implements Serializable {
     private String id;
     private String name;
 
-    public static Person create(String code) {
-        return new Person(generateId(), code);
+    public static Person create(String id, String name) {
+        return new Person(id, name);
     }
 
     public static Person empty() {
         return new Person();
     }
 
-    private static String generateId() {
-        return UUID.randomUUID().toString();
+    public void updateName(String newName) {
+        this.name = newName;
     }
 }

@@ -1,6 +1,7 @@
 package com.aks.study.ehcache.service;
 
 import com.aks.study.ehcache.constants.EhCacheConfigurationConstants;
+import com.aks.study.ehcache.entity.Person;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,31 +24,70 @@ public class EhcachePersonServiceTest {
     }
 
     @Test
-    public void getNonCachedPerson_호출시_캐싱되지않는다() {
+    public void selectPerson_호출시_캐싱되지않는다() {
 
         // given
-        String name = "악스";
+        String id = "aks";
 
         // when
-        ehcachePersonService.getNonCachedPerson(name);
+        ehcachePersonService.selectPerson(id);
 
         //then
-        Cache.ValueWrapper cache = cacheManager.getCache(EhCacheConfigurationConstants.PERSON_CACHE).get("악스");// 캐싱 조회
+        Cache.ValueWrapper cache = cacheManager.getCache(EhCacheConfigurationConstants.PERSON_CACHE).get(id);// 캐싱 조회
         Assertions.assertNull(cache);
     }
 
     @Test
-    public void getCachedPerson_호출시_캐싱된다() {
+    public void selectPersonFromCache_호출시_캐싱된다() {
 
         // given
-        String name = "악스";
+        String id = "aks";
 
         // when
-        ehcachePersonService.getCachedPerson(name);
+        ehcachePersonService.selectPersonFromCache(id);
 
         //then
-        Cache.ValueWrapper cache = cacheManager.getCache(EhCacheConfigurationConstants.PERSON_CACHE).get("악스");// 캐싱 조회
+        Cache.ValueWrapper cache = cacheManager.getCache(EhCacheConfigurationConstants.PERSON_CACHE).get(id);// 캐싱 조회
         Assertions.assertNotNull(cache);
+
+    }
+
+    @Test
+    public void updatePersonInCache_호출시_캐시가_변경된다() {
+
+        // given
+        String id = "aks";
+        String expected = "스악";
+        ehcachePersonService.selectPersonFromCache(id); // 먼저 1회 호출하여 캐싱한다.
+
+
+        // when
+        ehcachePersonService.updatePersonInCache(id, expected); // 캐시 값을 변경한다.
+
+        //then
+        Cache.ValueWrapper actualWrapper = cacheManager.getCache(EhCacheConfigurationConstants.PERSON_CACHE).get(id);// 변경 후 캐싱 조회
+        String actual = ((Person) actualWrapper.get()).getName(); // 캐시에서 변경한 name 값을 가져온다.
+
+        Assertions.assertEquals(expected, actual);
+
+    }
+
+    @Test
+    public void deletePersonInCache_호출시_캐시가_삭제된다() {
+
+        // given
+        String id = "aks";
+        ehcachePersonService.selectPersonFromCache(id); // 먼저 1회 호출하여 캐싱한다.
+
+
+        // when
+        ehcachePersonService.deletePersonFromCache(id); // 캐시 값을 삭제한다.
+
+
+        //then
+        Cache.ValueWrapper actual = cacheManager.getCache(EhCacheConfigurationConstants.PERSON_CACHE).get(id);// 캐시 조회한다.
+
+        Assertions.assertNull(actual);
 
     }
 }
