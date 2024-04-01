@@ -16,11 +16,11 @@ public class EhcacheController {
     private final EhcachePersonService ehcachePersonService;
     @GetMapping(value = "/no-cache-person/{name}")
     public Person getNoEhcacheCommonCode(@PathVariable String name) {
-        return ehcachePersonService.getNonCachedPerson(name);
+        return ehcachePersonService.selectPerson(name);
     }
 
     @GetMapping(value = "/cache-person/{name}")
     public String getEhcacheCommonCode(@PathVariable String name) {
-        return ehcachePersonService.getCachedPerson(name).toString();
+        return ehcachePersonService.selectPersonFromCache(name).toString();
     }
 }

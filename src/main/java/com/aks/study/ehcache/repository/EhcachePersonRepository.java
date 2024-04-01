@@ -7,7 +7,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class EhcachePersonRepository {
 
-    public Person getPerson(String name) {
-        return Persons.getPerson(name);
+    public Person selectPerson(String id) {
+        return Persons.getPerson(id);
+    }
+
+    public void deletePerson(String id) {
+        Persons.deletePerson(id);
     }
 }
